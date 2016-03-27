@@ -37,27 +37,27 @@ public class Driver {
             //game.drawPiece(game.mPosX,game.mPosY,game.mPiece,game.mRotation);
             //System.out.println("drawPiece just called");
 
-            if (instructions.equalsIgnoreCase("LEFT")) {
+            if (instructions.equalsIgnoreCase("RIGHT")) {
                 if(board.isPossibleMovement(game.mPosX+1,game.mPosY,game.mPiece,game.mRotation))
                     game.mPosX++;
             }
 
-            if (instructions.equalsIgnoreCase("RIGHT")) {
+            if (instructions.equalsIgnoreCase("LEFT")) {
                 if(board.isPossibleMovement(game.mPosX-1,game.mPosY,game.mPiece,game.mRotation))
                     game.mPosX--;
 
             }
             if(instructions.equalsIgnoreCase("ROTATE")){
-                int tempRotation  =(game.mRotation+1)%5;
+
+                int tempRotation  =(game.mRotation+1)%4;
                 if(board.isPossibleMovement(game.mPosX,game.mPosY,game.mPiece,tempRotation))
                     game.mRotation=tempRotation;
 
 
             }
             //progress the game piece down
-            GameLog gameLog = GameLog.getInstance();
-            gameLog.write("PROGRESS PIECE CLCULATION");
-            System.out.println("+++Progress piece calculation+++");
+            String log="\r\nPROGRESS PIECE CALCULATION";
+            log+="\r\n+++Progress piece calculation+++";
             if (board.isPossibleMovement(game.mPosX, game.mPosY + 1, game.mPiece, game.mRotation)) {
                 System.out.println("Progress: movement is possible tp " + (game.mPosY + 1));
                 //board.printSelectedShapeBlocks(game.mPiece,game.mRotation);
@@ -71,11 +71,12 @@ public class Driver {
                 board.deletePossibleLines();
 
                 if (board.isGameOver()) {
-                    GameLog.getInstance().close();
+
                     System.out.println("GAME OVER");
                     System.exit(0);
                 }
-                System.out.println("Creating new piece");
+                log+="\r\nCreating new piece";
+                GameLog.getInstance().write(log);
                 game.createNewPiece();
 
 

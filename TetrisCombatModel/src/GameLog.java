@@ -1,15 +1,26 @@
 import java.io.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * Created by nat on 3/27/16.
  */
+
+
+
 public class GameLog {
     public static GameLog mInstance=null;
-    private Writer writer;
+    private Logger logger;
     private GameLog(){
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream("gameLog.txt"), "utf-8"));
+             logger = Logger.getLogger("MyLog");
+            logger.setUseParentHandlers(false);
+            FileHandler fh = new FileHandler("Gamelog.txt");
+           // SimpleFormatter formatter = new SimpleFormatter();
+            CustomLogFormat format = new CustomLogFormat();
+            fh.setFormatter(format);
+            logger.addHandler(fh);
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
@@ -24,17 +35,9 @@ public class GameLog {
     }
 
     public void write(String s){
-        try {
-            writer.write(s);
-        }catch(IOException ioe){
-            ioe.printStackTrace();
-        }
+
+            logger.info(s);
+
     }
-    public void close(){
-        try{
-            writer.close();
-        }catch(IOException ioe){
-            ioe.printStackTrace();
-        }
-    }
+
 }

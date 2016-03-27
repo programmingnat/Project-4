@@ -57,6 +57,7 @@ public class Game {
         // Random next piece
         mNextPiece 		= getRandomWithinRange (0, 6);
         mNextRotation 	= getRandomWithinRange (0, 3);
+        GameLog.getInstance().write("createNewPiece: with pieceID"+mPiece+" rotation "+mRotation+" posX "+mPosX+" posY "+mPosY);
     }
 
     ////-------for debugging----------------------------------------

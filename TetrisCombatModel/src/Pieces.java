@@ -248,9 +248,9 @@ public class Pieces {
 /* I */
         {
             {-2, -2},
-            {-2, -3},
+            {-2, 0},//was -3
             {-2, -2},
-            {-2, -3}
+            {-2, 0}//was -3
         },
 /* L */
         {
@@ -299,7 +299,9 @@ public class Pieces {
      */
     int getBlockType (int pPiece, int pRotation, int pX, int pY)
     {
-        //System.out.println("getBlockType:"+pPiece+" "+pRotation+" "+pX+" "+pY);
+        String log = "Inside getBlockType with piece:";
+        log+=pPiece+" rotation "+pRotation+" pX "+pX+" pY "+pY;
+        GameLog.getInstance().write(log);
         return mPieces [pPiece][pRotation][pX][pY];
     }
 
@@ -311,7 +313,7 @@ public class Pieces {
      */
     int getXInitialPosition (int pPiece, int pRotation)
     {
-        return mPiecesInitialPosition [pPiece][pRotation][0];
+        return mPiecesInitialPosition [pPiece][pRotation][1];
     }
 
     /**
@@ -322,6 +324,6 @@ public class Pieces {
      */
     int getYInitialPosition (int pPiece, int pRotation)
     {
-        return mPiecesInitialPosition [pPiece][pRotation][1];
+        return mPiecesInitialPosition [pPiece][pRotation][0];
     }
 }

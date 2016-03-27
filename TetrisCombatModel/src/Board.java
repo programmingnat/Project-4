@@ -92,19 +92,22 @@ class Board{
 //        }
     }
     public void placePiece(int pX,int pY,int pieceType,int rotation){
-        //System.out.println("Inside placePiece with "+pX+" "+pY+" "+pieceType+" "+rotation);
+        String log = "Inside placePiece with "+pX+" "+pY+" "+pieceType+" "+rotation+"\r\n";
+
         for(int i=pY,pieceVerticalCounter=0;i<pY+PIECE_BLOCKS;i++,pieceVerticalCounter++){
 
             for(int j=pX,pieceHorizontalCounter=0;j<pX+PIECE_BLOCKS;j++,pieceHorizontalCounter++){
                 if(mPieces.getBlockType(pieceType,rotation,pieceVerticalCounter,pieceHorizontalCounter)!=0){
-                    //int blockType=mPieces.getBlockType(pieceType,rotation,j,i);
-                    //System.out.println("found block type "+blockType+" to be placed at "+i+","+j);
+                    int blockType=mPieces.getBlockType(pieceType,rotation,pieceVerticalCounter,pieceHorizontalCounter);
+                    System.out.println("found block type "+blockType+" to be placed at "+i+","+j+" piece coord "+pieceVerticalCounter+" "+pieceHorizontalCounter);
+                    log+="found block type "+blockType+" to be placed at "+i+","+j+"\r\n";
 
                     mBoard[i][j]=POS_FILLED;
                 }
             }//end of for loop going across
-
+            GameLog.getInstance().write(log);
         }//for loop going down
+
     }
 
     public boolean isGameOver()
@@ -163,24 +166,24 @@ class Board{
 
     public boolean isPossibleMovement (int pX, int pY, int pPiece, int pRotation)
     {
-       //System.out.println("inside isPossibleMovement with pX:"+pX+" pY:"+pY+" pPiece:"+pPiece+" pRotation:"+pRotation);
+       String log = "inside isPossibleMovement with pX:"+pX+" pY:"+pY+" pPiece:"+pPiece+" pRotation:"+pRotation+"\r\n";
         // Checks collision with pieces already stored in the board or the board limits
         // This is just to check the 5x5 blocks of a piece with the appropiate area in the board
         for (int i1 = pY, i2 = 0; i1 < pY + PIECE_BLOCKS; i1++, i2++) {
             for (int j1 = pX, j2 = 0; j1 < pX + PIECE_BLOCKS; j1++, j2++) {
-                //System.out.println("Inner loop isPossibleMovement, value of i1:"+i1+" j1 is "+j1+" i2 (block)"+i2+" j2(block)"+j2);
+                log+="Inner loop isPossibleMovement, value of i1:"+i1+" j1:"+j1+" i2 (block)"+i2+" j2(block)"+j2+"\r\n";
                 // Check if the piece is outside the limits of the board
                 if (	i1 < 0 ||i1 > (BOARD_HEIGHT  - 1)	|| j1<0 || j1 > (BOARD_WIDTH - 1)){
-                    //System.out.println("piece may be outside of boundaries "+i1+" "+j1+" "+i2+" "+j2);
+                    log+="piece may be outside of boundaries "+i1+" "+j1+" "+i2+" "+j2+"\r\n";
                     //System.out.println("Checking if piece is outside of board");
                     int k = mPieces.getBlockType (pPiece, pRotation, i2, j2);
                     int[][][][] theData=Pieces.getPieces();
                     int k2 = theData[pPiece][0][i2][j2];
-                    //System.out.println("block type at "+i2+" "+j2+" is "+k+ " checking at board coord "+i1+" "+j1+"k2 is "+k2);
+                    log+="block type at "+i2+" "+j2+" is "+k+ " checking at board coord "+i1+" "+j1+"k2 is "+k2+"\r\n";
                     if (mPieces.getBlockType (pPiece, pRotation, i2, j2) != 0) {
                         printSelectedShapeBlocks(pPiece,pRotation);
 
-
+                        GameLog.getInstance().write(log);
                         System.out.println("=================================piece is outside of board=== "+j2+" "+i2);
                         return false;
                     }
@@ -190,14 +193,15 @@ class Board{
                 //debug...gotta clear
                 //j1 is horizontal coord
                 if (j1 >= 0) {
-                    //System.out.println("checking of collision with other block, going through columns");
+                    log+="checking of collision with other block, going through columns\r\n";
 
                     int blockType=mPieces.getBlockType (pPiece, pRotation, i2, j2);
-                    //System.out.println("Found blockType "+blockType+" at row "+j2+" column "+i2+" piece "+pPiece);
+                    log+="Found blockType "+blockType+" at row "+j2+" column "+i2+" piece "+pPiece+"\r\n";
                     if (blockType!=0 ){
                             if((!isFreeBlock (i1, j1))){
                                 printSelectedShapeBlocks(pPiece,pRotation);
                                 System.out.println("==============================collision with block");
+                                GameLog.getInstance().write(log);
                                 return false;
                             }//end ofif
                     }//end of if
@@ -207,6 +211,7 @@ class Board{
 
         // No collision
         System.out.println("=========================================no collision detected");
+        GameLog.getInstance().write(log);
         return true;
     }
     public void printBoard(){
