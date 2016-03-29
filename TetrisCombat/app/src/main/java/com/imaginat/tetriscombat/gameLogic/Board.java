@@ -5,7 +5,6 @@ package com.imaginat.tetriscombat.gameLogic;
  */
 
 import android.graphics.Color;
-import android.util.Log;
 
 import com.imaginat.tetriscombat.framework.Graphics;
 
@@ -75,25 +74,7 @@ public class Board{
             }//end of for loop going across
 
         }//for loop going down
-      /*  System.out.println("Inside paintMovingPiece with "+pX+" "+pY+" "+pieceType+" "+rotation);
-        //clear previous
-        clearMovingPiece();
-        for(int i=pY,pieceVerticalCounter=0;i<pY+PIECE_BLOCKS;i++,pieceVerticalCounter++){
 
-            for(int j=pX,pieceHorizontalCounter=0;j<pX+PIECE_BLOCKS;j++,pieceHorizontalCounter++){
-
-                if(mPieces.getBlockType(pieceType,rotation,pieceVerticalCounter,pieceHorizontalCounter)!=0){
-                    //int blockType=mPieces.getBlockType(pieceType,rotation,j,i);
-                    //System.out.println("found block type "+blockType+" to be placed at "+i+","+j);
-                    if(i<0  || j<0){
-                        continue;
-                    }
-                    debugIDrewHere.push(new DebugPoint(i,j));
-                    mBoard[i][j]=TEMP_PAINT;
-                }
-            }//end of for loop going across
-
-        }//for loop going down*/
     }
 
     //for debuggint purposes
@@ -114,14 +95,15 @@ public class Board{
 //        }
     }
     public void placePiece(int pX,int pY,int pieceType,int rotation){
-        Log.d("Board","Inside placePiece with " + pX + " " + pY + " " + pieceType + " " + rotation );
-
+        GameLog.log("Inside placePiece with " + pX + " " + pY + " " + pieceType + " " + rotation );
+        GameLog.log("board before this call");
+        printBoard();
         for(int i=pY,pieceVerticalCounter=0;i<pY+PIECE_BLOCKS;i++,pieceVerticalCounter++){
 
             for(int j=pX,pieceHorizontalCounter=0;j<pX+PIECE_BLOCKS;j++,pieceHorizontalCounter++){
                 if(mPieces.getBlockType(pieceType,rotation,pieceVerticalCounter,pieceHorizontalCounter)!=0){
                     int blockType=mPieces.getBlockType(pieceType,rotation,pieceVerticalCounter,pieceHorizontalCounter);
-                    Log.d("Board","found block type "+blockType+" to be placed at "+i+","+j+" piece coord "+pieceVerticalCounter+" "+pieceHorizontalCounter);
+                    GameLog.log("found block type "+blockType+" to be placed at "+i+","+j+" piece coord "+pieceVerticalCounter+" "+pieceHorizontalCounter);
                     //log+="found block type "+blockType+" to be placed at "+i+","+j+"\r\n";
 
 
@@ -138,7 +120,10 @@ public class Board{
         //If the first line has blocks, then, game over
         for (int i = 0; i < BOARD_WIDTH; i++)
         {
-            if (mBoard[0][i] == POS_FILLED) return true;
+            if (mBoard[0][i] == POS_FILLED){
+                System.out.println("isGameOver? foiund block at [0]["+i+"]");
+                return true;
+            }
         }
 
         return false;
@@ -189,25 +174,25 @@ public class Board{
 
     public boolean isPossibleMovement (int pX, int pY, int pPiece, int pRotation)
     {
-        Log.d("Board","++++++++++inside isPossibleMovement with pX:"+pX+" pY:"+pY+" pPiece:"+pPiece+" pRotation:"+pRotation);
+        GameLog.log("++++++++++inside isPossibleMovement with pX:"+pX+" pY:"+pY+" pPiece:"+pPiece+" pRotation:"+pRotation);
         // Checks collision with pieces already stored in the board or the board limits
         // This is just to check the 5x5 blocks of a piece with the appropiate area in the board
         for (int i1 = pY, i2 = 0; i1 < pY + PIECE_BLOCKS; i1++, i2++) {
             for (int j1 = pX, j2 = 0; j1 < pX + PIECE_BLOCKS; j1++, j2++) {
-                Log.d("Board","Inner loop isPossibleMovement, value of i1:"+i1+" j1:"+j1+" i2 (block)"+i2+" j2(block)"+j2);
+                //GameLog.log("+++Inner loop isPossibleMovement, value of i1:"+i1+" j1:"+j1+" i2 (block)"+i2+" j2(block)"+j2);
                 // Check if the piece is outside the limits of the board
-                if (	i1 < 0 ||i1 > (BOARD_HEIGHT  - 1)	|| j1<0 || j1 > (BOARD_WIDTH - 1)){
-                    Log.d("Board","piece may be outside of boundaries "+i1+" "+j1+" "+i2+" "+j2);
+                if (	i1 > (BOARD_HEIGHT  - 1)	|| j1<0 || j1 > (BOARD_WIDTH - 1)){
+                    GameLog.log("++++piece may be outside of boundaries "+i1+" "+j1+" "+i2+" "+j2);
                     //System.out.println("Checking if piece is outside of board");
                     int k = mPieces.getBlockType (pPiece, pRotation, i2, j2);
                     int[][][][] theData=Pieces.getPieces();
                     int k2 = theData[pPiece][0][i2][j2];
-                    Log.d("Board","block type at "+i2+" "+j2+" is "+k+ " checking at board coord "+i1+" "+j1+"k2 is "+k2);
+                   GameLog.log("block type at "+i2+" "+j2+" is "+k+ " checking at board coord "+i1+" "+j1+"k2 is "+k2);
                     if (mPieces.getBlockType (pPiece, pRotation, i2, j2) != 0) {
                         printSelectedShapeBlocks(pPiece,pRotation);
                         printBoard();
                         //GameLog.getInstance().write(log);
-                        System.out.println("=================================piece is outside of board=== "+j2+" "+i2);
+                        GameLog.log("=================================piece is outside of board=== coordinates:("+i1+","+j1+"). Parts of the block that are outside"+j2+" "+i2);
                         return false;
                     }
                 }
@@ -215,16 +200,16 @@ public class Board{
                 // Check if the piece have collisioned with a block already stored in the map
                 //debug...gotta clear
                 //j1 is horizontal coord
-                if (j1 >= 0) {
-                    Log.d("Board","checking of collision with other block, going through columns");
+                if (i1 >= 0) {
+                    //GameLog.log("checking of collision with other block, going through columns");
 
                     int blockType=mPieces.getBlockType (pPiece, pRotation, i2, j2);
-                    Log.d("Board","Found blockType "+blockType+" at row "+j2+" column "+i2+" piece "+pPiece);
+                    //GameLog.log("Found blockType "+blockType+" at row "+j2+" column "+i2+" piece "+pPiece);
                     if (blockType!=0 ){
                         if((!isFreeBlock (i1, j1))){
                             printSelectedShapeBlocks(pPiece,pRotation);
                             printBoard();
-                            System.out.println("==============================collision with block");
+                            GameLog.log("==============================collision with block");
                             //GameLog.getInstance().write(log);
                             return false;
                         }//end ofif
@@ -234,7 +219,7 @@ public class Board{
         }
 
         // No collision
-        System.out.println("=========================================no collision detected");
+        GameLog.log("=========================================no collision detected");
         //GameLog.getInstance().write(log);
         return true;
     }

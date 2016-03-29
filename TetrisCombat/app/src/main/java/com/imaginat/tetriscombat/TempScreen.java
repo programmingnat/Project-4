@@ -8,6 +8,7 @@ import com.imaginat.tetriscombat.framework.Graphics;
 import com.imaginat.tetriscombat.framework.Input.TouchEvent;
 import com.imaginat.tetriscombat.framework.Screen;
 import com.imaginat.tetriscombat.gameLogic.Board;
+import com.imaginat.tetriscombat.gameLogic.GameLog;
 import com.imaginat.tetriscombat.gameLogic.GameModel;
 import com.imaginat.tetriscombat.gameLogic.Pieces;
 
@@ -22,17 +23,19 @@ public class TempScreen extends Screen {
     Board mBoard = null;
     GameModel mGameModel = null;
 
+
     TestBox theHorizontalTestBox;
     TestBox theVerticalTestBox;
     int deltaX = 1, deltaY;
 
     static final float TICK_INITIAL = 1.5f;
-    static final float TICK_DECREMENT = 0.05f;
+    static final float TICK_DECREMENT = 0.5f;
     float tickTime = 0;
     static float tick = TICK_INITIAL;
 
     boolean isGameOver = false;
     boolean isPaused=false;
+    boolean doIt=false;
 
     public TempScreen(Game game) {
         super(game);
@@ -121,6 +124,7 @@ public class TempScreen extends Screen {
                         isPaused=true;
                         mBoard.printBoard();
                     }
+                    doIt=true;
 
                 }
             }
@@ -133,29 +137,30 @@ public class TempScreen extends Screen {
         }
         tickTime += deltaTime;
         while (tickTime > tick) {
+        //if(doIt){
             tickTime -= tick;
             //progress the game piece down
-            Log.d("TempScreen","--------------------------------PROGRESS PIECE CALCULATION-------------------------------");
+            GameLog.log("--------------------------------BEGINNING OF TICK (after input) tickTime"+tickTime+" tick"+tick+"-------------------------------");
             //log += "\r\n+++Progress piece calculation+++";
             if (mBoard.isPossibleMovement(mGameModel.mPosX, mGameModel.mPosY + 1, mGameModel.mPiece, mGameModel.mRotation)) {
-                Log.d("TempScreen","Progress: movement is possible tp " + (mGameModel.mPosY + 1));
+                GameLog.log("+++PROGRESS: movement is possible yPosition:" + (mGameModel.mPosY + 1));
                 //board.printSelectedShapeBlocks(game.mPiece,game.mRotation);
                 //mGameModel.drawPiece(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation);
                 mGameModel.mPosY++;
 
             } else {
-                Log.d("TempScreen","movement of game piece not possible, current x,y is "+mGameModel.mPosX+" "+mGameModel.mPosY);
+                GameLog.log("+++PROGRESS: movement of game piece not possible, current x,y is "+mGameModel.mPosX+" "+mGameModel.mPosY);
                 mBoard.placePiece(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation);
 
                 mBoard.deletePossibleLines();
 
-                /*if (mBoard.isGameOver()) {
+                if (mBoard.isGameOver()) {
 
                     System.out.println("GAME OVER");
                     //isGameOver = true;
                     System.exit(0);
-                }*/
-                Log.d("TempScreen","Creating new piece");
+                }
+                GameLog.log("++++++++CREATING new piece");
                 //GameLog.getInstance().write(log);
                 mGameModel.createNewPiece();
 
@@ -163,26 +168,10 @@ public class TempScreen extends Screen {
             if (tick - TICK_DECREMENT > 0) {
                 tick -= TICK_DECREMENT;
             }
+            doIt=false;
         }
 
-        /*if(theHorizontalTestBox.x>235){
-            theHorizontalTestBox.x=235;
-            deltaX=-1;
-        }else if(theHorizontalTestBox.x<=10){
-            theHorizontalTestBox.x=10;
-            deltaX=1;
-        }
-        theHorizontalTestBox.x+=deltaX;
 
-        if(theVerticalTestBox.y>=375){
-            theVerticalTestBox.y=375;
-            deltaY=-1;
-        }else if(theVerticalTestBox.y<=0){
-            theVerticalTestBox.y=0;
-            deltaY=1;
-        }
-        theVerticalTestBox.y+=deltaY;
-*/
 
     }
 

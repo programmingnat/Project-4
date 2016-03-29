@@ -38,13 +38,13 @@ public class GameModel {
 
 
         // First piece
-        mPiece			= 0;//getRandomWithinRange (0, 6);
+        mPiece			= getRandomWithinRange (0, 6);
         mRotation		= getRandomWithinRange (0, 3);
         mPosX 			= (Board.BOARD_WIDTH / 2) + mPieces.getXInitialPosition (mPiece, mRotation);
         mPosY 			= mPieces.getYInitialPosition (mPiece, mRotation);
 
         //  Next piece
-        mNextPiece 		= 0;//getRandomWithinRange (0, 6);
+        mNextPiece 		= getRandomWithinRange (0, 6);
         mNextRotation 	= getRandomWithinRange (0, 3);
         mNextPosX 		= Board.BOARD_WIDTH + 5;
         mNextPosY 		= 5;
@@ -53,13 +53,13 @@ public class GameModel {
     public void createNewPiece()
     {
         // The new piece
-        mPiece			= 0;//mNextPiece;
+        mPiece			= mNextPiece;
         mRotation		= mNextRotation;
         mPosX 			= (Board.BOARD_WIDTH / 2) + mPieces.getXInitialPosition (mPiece, mRotation);
         mPosY 			= mPieces.getYInitialPosition (mPiece, mRotation);
 
         // Random next piece
-        mNextPiece 		= 0;//getRandomWithinRange (0, 6);
+        mNextPiece 		= getRandomWithinRange (0, 6);
         mNextRotation 	= getRandomWithinRange (0, 3);
         GameLog.getInstance().write("createNewPiece: with pieceID"+mPiece+" rotation "+mRotation+" posX "+mPosX+" posY "+mPosY);
     }
