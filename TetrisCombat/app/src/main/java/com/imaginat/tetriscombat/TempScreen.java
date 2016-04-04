@@ -11,6 +11,7 @@ import com.imaginat.tetriscombat.gameLogic.Board;
 import com.imaginat.tetriscombat.gameLogic.GameLog;
 import com.imaginat.tetriscombat.gameLogic.GameModel;
 import com.imaginat.tetriscombat.gameLogic.Pieces;
+import com.imaginat.tetriscombat.googleAPIHelper.GoogleHelper;
 
 import java.util.List;
 
@@ -37,6 +38,8 @@ public class TempScreen extends Screen {
     boolean isPaused=false;
     boolean doIt=false;
 
+    GoogleHelper mGoogleHelper=null;
+
     public TempScreen(Game game) {
         super(game);
         theHorizontalTestBox = new TestBox();
@@ -49,6 +52,8 @@ public class TempScreen extends Screen {
         mBoard.init();
         mGameModel = new GameModel(mBoard, mPieces);
         mGameModel.initGame();
+
+        mGoogleHelper = GoogleHelper.forceGetInstance();
     }
 
     private boolean inBounds(TouchEvent event, int x, int y, int width, int height) {
@@ -149,10 +154,15 @@ public class TempScreen extends Screen {
                 mGameModel.mPosY++;
 
             } else {
-                GameLog.log("+++PROGRESS: movement of game piece not possible, current x,y is "+mGameModel.mPosX+" "+mGameModel.mPosY);
+                GameLog.log("+++PROGRESS: movement of game piece not possible, current x,y is " + mGameModel.mPosX + " " + mGameModel.mPosY);
                 mBoard.placePiece(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation);
 
                 mBoard.deletePossibleLines();
+
+                //call to send info over
+                Log.d("TempScreen","About to call setScore and boradcastScore");
+                mGoogleHelper.setScore(mBoard.getDeletedLineCount());
+                GoogleHelper.getInstance().broadcastScore(false);
 
                 if (mBoard.isGameOver()) {
 

@@ -11,7 +11,20 @@
     tools:context="com.imaginat.tetriscombat.MainActivity">
 
     <TextView
+        android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+        android:text="Tetris: Combat"/>
+    <Button
+        android:text="SINGLE PLAYER"
+        android:layout_below="@id/titleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/singlePlayerButton"/>
+    <Button
+        android:text="MULTIPLAYER"
+        android:id="@+id/multiPlayerButton"
+        android:layout_below="@id/singlePlayerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

@@ -26,7 +26,7 @@ public class Board{
 
 
 
-
+    private int mDeletedLineCount;
 
     private byte[][] mBoard;
     private Pieces mPieces = null;
@@ -141,6 +141,9 @@ public class Board{
         }
     }
 
+    public int getDeletedLineCount(){
+        return mDeletedLineCount;
+    }
     public void deletePossibleLines ()
     {
         for (int j = 0; j < BOARD_HEIGHT; j++)
@@ -154,6 +157,7 @@ public class Board{
 
             if (i == BOARD_WIDTH){
                 System.out.println("DETERMINED TO DELEtE LINE "+j);
+                mDeletedLineCount++;
                 deleteLine (j);
             }
         }
