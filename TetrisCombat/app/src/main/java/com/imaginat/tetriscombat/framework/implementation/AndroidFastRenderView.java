@@ -6,18 +6,20 @@ import android.graphics.Rect;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.imaginat.tetriscombat.GameBoardFragment;
+
 /**
  * Created by nat on 3/20/16.
  */
 public class AndroidFastRenderView extends SurfaceView implements Runnable {
-    AndroidGame game;
+    GameBoardFragment game;
     Bitmap framebuffer;
     Thread renderThread = null;
     SurfaceHolder holder;
     volatile boolean running = false;
 
-    public AndroidFastRenderView(AndroidGame game, Bitmap framebuffer) {
-        super(game);
+    public AndroidFastRenderView(GameBoardFragment game, Bitmap framebuffer) {
+        super(game.getContext());
         this.game = game;
         this.framebuffer = framebuffer;
         this.holder = getHolder();

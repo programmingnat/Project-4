@@ -3,7 +3,6 @@ package com.imaginat.tetriscombat;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -40,7 +39,7 @@ import java.util.Set;
 public class MultiPlayerActivity  extends BaseGameActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener, RealTimeMessageReceivedListener,
-        RoomStatusUpdateListener, RoomUpdateListener, OnInvitationReceivedListener {
+        RoomStatusUpdateListener, RoomUpdateListener, OnInvitationReceivedListener, GameBoardFragment.ISendInfo {
 
 
     MessageListener mMessageListener;
@@ -188,6 +187,7 @@ public class MultiPlayerActivity  extends BaseGameActivity
         RoomConfig.Builder rtmConfigBuilder = RoomConfig.builder(this);
         mMessageListener = new MessageListener();
         rtmConfigBuilder.setMessageReceivedListener(this);//(mMessageListener);//GoogleHelper.getInstance());
+        //rtmConfigBuilder.setMessageReceivedListener(GoogleHelper.getInstance());
         rtmConfigBuilder.setRoomStatusUpdateListener(this);
         rtmConfigBuilder.setAutoMatchCriteria(autoMatchCriteria);
         switchToScreen(R.id.screen_wait);
@@ -654,19 +654,21 @@ public class MultiPlayerActivity  extends BaseGameActivity
     void startGame(boolean multiplayer) {
         mMultiplayer = multiplayer;
         mGoogleHelper.setMultiplayer(multiplayer);
-       /* Intent toGame = new Intent(MultiPlayerActivity.this,TetrisCombat.class);
 
-        startActivity(toGame);*/
+
+        GameBoardFragment gameBoardFragment = (GameBoardFragment)getSupportFragmentManager().findFragmentById(R.id.fragment2);
+        gameBoardFragment.setScreen(new TempScreen(gameBoardFragment));
+
         updateScoreDisplay();
         mGoogleHelper.broadcastScore(false);
-
+        hideAllScreen();
         //broadcastScore(false);
-        switchToScreen(R.id.screen_game);
+        //switchToScreen(R.id.screen_game);
 
-        findViewById(R.id.button_click_me).setVisibility(View.VISIBLE);
+        //findViewById(R.id.button_click_me).setVisibility(View.VISIBLE);
 
         // run the gameTick() method every second to update the game.
-        final Handler h = new Handler();
+        /*final Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -675,7 +677,7 @@ public class MultiPlayerActivity  extends BaseGameActivity
                 gameTick();
                 h.postDelayed(this, 1000);
             }
-        }, 1000);
+        }, 1000);*/
     }
 
     // Game tick -- update countdown, check if game ended.
@@ -690,7 +692,7 @@ public class MultiPlayerActivity  extends BaseGameActivity
         if (mSecondsLeft <= 0) {
             // finish game
             findViewById(R.id.button_click_me).setVisibility(View.GONE);
-            broadcastScore(true);
+            //broadcastScore(true);
             GoogleHelper.getInstance().setScore(mScore);
             GoogleHelper.getInstance().broadcastScore(true);
 
@@ -707,9 +709,9 @@ public class MultiPlayerActivity  extends BaseGameActivity
         updatePeerScoresDisplay();
 
         // broadcast our new score to our peers
-        //GoogleHelper.getInstance().setScore(mScore);
-        //GoogleHelper.getInstance().broadcastScore(false);
-        broadcastScore(false);
+        GoogleHelper.getInstance().setScore(mScore);
+        GoogleHelper.getInstance().broadcastScore(false);
+        //broadcastScore(false);
     }
 
     /*
@@ -835,6 +837,11 @@ public class MultiPlayerActivity  extends BaseGameActivity
         findViewById(R.id.invitation_popup).setVisibility(showInvPopup ? View.VISIBLE : View.GONE);
     }
 
+    void hideAllScreen(){
+        for (int id : SCREENS) {
+            findViewById(id).setVisibility(View.GONE);
+        }
+    }
     void switchToMainScreen() {
 
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
@@ -861,6 +868,8 @@ public class MultiPlayerActivity  extends BaseGameActivity
 
     // updates the screen with the scores from our peers
     void updatePeerScoresDisplay() {
+        mParticipants=mGoogleHelper.getParticipants();
+        Log.d("MultiPlayerActivity","size of mParticipants is "+mParticipants.size());
         ((TextView) findViewById(R.id.score0)).setText(formatScore(mScore) + " - Me");
         int[] arr = {
                 R.id.score1, R.id.score2, R.id.score3
@@ -909,5 +918,11 @@ public class MultiPlayerActivity  extends BaseGameActivity
     @Override
     public void onSignInSucceeded() {
         Log.d("MultiPlayer","Sign in succeeded");
+    }
+
+    @Override
+    public void communicate() {
+        Log.d("MultiplayerActivity","Communicate Called");
+        broadcastScore(false);
     }
 }

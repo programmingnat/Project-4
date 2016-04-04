@@ -17,8 +17,7 @@ public class MainActivity extends AppCompatActivity {
         singlePlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toSinglePlayerGame = new Intent(MainActivity.this,TetrisCombat.class);
-                startActivity(toSinglePlayerGame);
+
             }
         });
 

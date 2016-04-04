@@ -25,6 +25,8 @@ public class TempScreen extends Screen {
     GameModel mGameModel = null;
 
 
+    GameBoardFragment.ISendInfo isendInfo=null;
+
     TestBox theHorizontalTestBox;
     TestBox theVerticalTestBox;
     int deltaX = 1, deltaY;
@@ -39,9 +41,11 @@ public class TempScreen extends Screen {
     boolean doIt=false;
 
     GoogleHelper mGoogleHelper=null;
+    GameBoardFragment.ISendInfo iSendInfoInterface=null;
 
     public TempScreen(Game game) {
         super(game);
+
         theHorizontalTestBox = new TestBox();
         theVerticalTestBox = new TestBox();
         theVerticalTestBox.setCurrentColor(Color.BLUE);
@@ -56,6 +60,9 @@ public class TempScreen extends Screen {
         mGoogleHelper = GoogleHelper.forceGetInstance();
     }
 
+    public void setCommunicationInterface(GameBoardFragment.ISendInfo isendInfo){
+            this.isendInfo = isendInfo;
+    }
     private boolean inBounds(TouchEvent event, int x, int y, int width, int height) {
         if (event.x > x && event.x < x + width - 1 && event.y > y && event.y < y + height - 1) {
             return true;
@@ -66,7 +73,7 @@ public class TempScreen extends Screen {
 
     @Override
     public void update(float deltaTime) {
-        if (isGameOver) {
+       if (isGameOver) {
             return;
         }
 
@@ -145,7 +152,7 @@ public class TempScreen extends Screen {
         //if(doIt){
             tickTime -= tick;
             //progress the game piece down
-            GameLog.log("--------------------------------BEGINNING OF TICK (after input) tickTime"+tickTime+" tick"+tick+"-------------------------------");
+            GameLog.log("--------------------------------BEGINNING OF TICK (after input) tickTime" + tickTime + " tick" + tick + "-------------------------------");
             //log += "\r\n+++Progress piece calculation+++";
             if (mBoard.isPossibleMovement(mGameModel.mPosX, mGameModel.mPosY + 1, mGameModel.mPiece, mGameModel.mRotation)) {
                 GameLog.log("+++PROGRESS: movement is possible yPosition:" + (mGameModel.mPosY + 1));
@@ -160,10 +167,10 @@ public class TempScreen extends Screen {
                 mBoard.deletePossibleLines();
 
                 //call to send info over
-                Log.d("TempScreen","About to call setScore and boradcastScore");
-                mGoogleHelper.setScore(mBoard.getDeletedLineCount());
-                GoogleHelper.getInstance().broadcastScore(false);
-
+                Log.d("TempScreen", "About to call setScore and boradcastScore");
+                //mGoogleHelper.setScore(mBoard.getDeletedLineCount());
+                //GoogleHelper.getInstance().broadcastScore(false);
+                isendInfo.communicate();
                 if (mBoard.isGameOver()) {
 
                     System.out.println("GAME OVER");
@@ -209,6 +216,7 @@ public class TempScreen extends Screen {
         g.drawRect(g.getWidth() - 60, 450, 60, 30, Color.BLUE);
         g.drawRect(61, 450, 100, 30, Color.GREEN);
         g.drawRect(161, 450, 99, 30, Color.GRAY);
+
     }
 
     @Override
