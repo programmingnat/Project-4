@@ -21,6 +21,15 @@ import java.util.List;
  */
 public class TempScreen extends Screen {
 
+    class FakeButton{
+        int x,y,width,length;
+    }
+
+
+    //for demo purposes
+    FakeButton[] mCheatSheetButtons = new FakeButton[5];
+    boolean mIsCheatSheetOn=false;
+
     Pieces mPieces = null;
     Board mBoard = null;
     GameModel mGameModel = null;
@@ -35,7 +44,30 @@ public class TempScreen extends Screen {
     int deltaX = 1, deltaY;
 
     static final float TICK_INITIAL = 1.5f;
+    private boolean mDisplayControls=true;
+    private boolean mBlockView = false;
+    public void toggleControls(){
+        if(mDisplayControls){
+            mDisplayControls=false;
+        }else{
+            mDisplayControls=true;
+        }
+    }
 
+    public void clearProgress(){
+        isPaused=true;
+        mBoard.clearBoard();
+        isPaused=false;
+        mMyScore=0;
+    }
+
+    public void toggleBlockView(){
+        if(mBlockView){
+            mBlockView=false;
+        }else{
+            mBlockView=true;
+        }
+    }
     public int getMyScore() {
         return mMyScore;
     }
@@ -78,6 +110,14 @@ public class TempScreen extends Screen {
         mGameModel.initGame();
 
         mGoogleHelper = GoogleHelper.forceGetInstance();
+
+        for(int i=0;i<mCheatSheetButtons.length;i++){
+            FakeButton b = new FakeButton();
+            b.x=320-60;
+            b.y=60+(i*60)+2;
+            b.width=b.length=60;
+            mCheatSheetButtons[i] = b;
+        }
     }
 
     public void setCommunicationInterface(GameBoardFragment.ISendInfo isendInfo){
@@ -108,11 +148,11 @@ public class TempScreen extends Screen {
         g.drawRect(161, 450, 99, 30, Color.GRAY);*/
 
 
-
+        int theWidth = g.getWidth();
         for (int i = 0; i < len; i++) {
             TouchEvent event = touchEvents.get(i);
             if (event.type == TouchEvent.TOUCH_UP) {
-                if (inBounds(event, 0, 450, 60, 30)) {
+                if (inBounds(event, 320-75, 410, 65, 65)) {
                     Log.d("TempScreen", "Clicked Rotate1");
                     int tempRotation = (mGameModel.mRotation + 1) % 4;
                     if (mBoard.isPossibleMovement(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, tempRotation))
@@ -121,17 +161,15 @@ public class TempScreen extends Screen {
                 }
             }
 
-            if (event.type == TouchEvent.TOUCH_UP) {
-                if (inBounds(event, g.getWidth() - 60, 450, 60, 30)) {
-                    Log.d("TempScreen", "Clicked Rotate2");
-                    int tempRotation = Math.abs((mGameModel.mRotation - 1) % 4);
-                    if (mBoard.isPossibleMovement(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, tempRotation))
-                        mGameModel.mRotation = tempRotation;
-                }
-            }
+
+
+
+
+
+
 
             if (event.type == TouchEvent.TOUCH_UP) {
-                if (inBounds(event, 61, 450, 100, 30)) {
+                if (inBounds(event, 10, 416, 32, 42)) {
                     Log.d("TempScreen", "Clicked Move Left");
                     if (mBoard.isPossibleMovement(mGameModel.mPosX - 1, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation))
                         mGameModel.mPosX--;
@@ -139,15 +177,23 @@ public class TempScreen extends Screen {
             }
 
             if (event.type == TouchEvent.TOUCH_UP) {
-                if (inBounds(event, 161, 450, 99, 30)) {
+                if (inBounds(event, 60, 416, 32, 42)) {
                     Log.d("TempScreen", "Clicked Move Right");
                     if (mBoard.isPossibleMovement(mGameModel.mPosX + 1, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation))
                         mGameModel.mPosX++;
                 }
             }
 
+            if (event.type == TouchEvent.TOUCH_UP) {
+                if (inBounds(event, 43, 460, 20, 32)) {
+                    Log.d("TempScreen", "Clicked Move down");
+                    if (mBoard.isPossibleMovement(mGameModel.mPosY+ 1, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation))
+                        mGameModel.mPosY++;
+                }
+            }
+
             if(event.type==TouchEvent.TOUCH_UP){
-                if(inBounds(event,0,400,65,65)){
+                if(inBounds(event,140,420,50,50)){
                     if(isPaused){
                         Log.d("TempScreen","UNPAUSED");
                         isPaused=false;
@@ -160,6 +206,35 @@ public class TempScreen extends Screen {
 
                 }
             }
+
+            if(mIsCheatSheetOn) {
+                if (event.type == TouchEvent.TOUCH_UP) {
+                    for (int cc = 0; cc < mCheatSheetButtons.length; cc++) {
+                        FakeButton b = mCheatSheetButtons[cc];
+                        if (inBounds(event, b.x, b.y, b.width, b.length)) {
+                            Log.d("TempScreen", "Button pressed " + cc);
+                            isendInfo.sendData(cc);
+                            break;
+                        }
+                    }
+
+                }
+            }
+            if(event.type==TouchEvent.TOUCH_UP){
+                if(inBounds(event,320-60,0,60,60)){
+                    Log.d("TempScreen","CHEAT SHEET");
+                    if(mIsCheatSheetOn)
+                        mIsCheatSheetOn=false;
+                    else
+                        mIsCheatSheetOn=true;
+
+
+                }
+            }
+
+
+
+
 
         }
 
@@ -193,9 +268,8 @@ public class TempScreen extends Screen {
                 isendInfo.communicate(mBoard.getDeletedLineCount());
                 if (mBoard.isGameOver()) {
 
-                    System.out.println("GAME OVER");
-                    //isGameOver = true;
-                    System.exit(0);
+                    isendInfo.sendData(-100);
+
                 }
                 GameLog.log("++++++++CREATING new piece");
                 //GameLog.getInstance().write(log);
@@ -231,18 +305,49 @@ public class TempScreen extends Screen {
         //g.drawLine(0,0,100,100, Color.RED);
         //g.drawRect(0,0,20,20,Color.RED);
 
+        if(mBlockView){
+            g.drawRect(0,200,320,200, Color.GRAY);
+            Paint p = new Paint();
+            p.setColor(Color.GREEN);
+            g.drawText("SORRY!",200,220,p);
+        }
         //input controls
         g.drawRect(0, 400, 320, 80, Color.WHITE);
-        g.drawRect(0, 450, 60, 30, Color.BLUE);
-        g.drawRect(g.getWidth() - 60, 450, 60, 30, Color.BLUE);
-        g.drawRect(61, 450, 100, 30, Color.GREEN);
-        g.drawRect(161, 450, 99, 30, Color.GRAY);
 
+        //rotate
+        //g.drawRect(g.getWidth() - 75, 410, 65, 65, Color.BLUE);
+
+
+
+//        //d-pad left
+//        g.drawRect(10, 416, 32 ,42, Color.GREEN);
+//        //d-pad right
+//        g.drawRect(42+18, 416, 32, 42, Color.GRAY);
+//        //d-pad down
+//        g.drawRect(43,460,20,32,Color.RED);
+//        //pause
+//        g.drawRect(140,420,50,50,Color.BLUE);
 
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
-        g.drawText("Me:"+mMyScore, 10, 20, paint);
-        g.drawText("Opponent:"+mOpponentScore, 10, 40, paint);
+        g.drawText("Me:" + mMyScore, 10, 20, paint);
+        g.drawText("Opponent:" + mOpponentScore, 10, 40, paint);
+
+       // g.drawPixmap(Assets.dPad, 10, 405);
+        if(mDisplayControls) {
+            g.drawPixmap(Assets.dPad, 10, 405);
+            g.drawPixmap(Assets.rotateButton, g.getWidth() - 75, 410);
+            g.drawPixmap(Assets.pauseButton, 140, 420);
+        }
+
+
+        if(mIsCheatSheetOn) {
+            for (int i = 0; i < mCheatSheetButtons.length; i++) {
+                FakeButton b = mCheatSheetButtons[i];
+                g.drawRect(b.x, b.y, b.width, b.length, Color.GRAY);
+
+            }
+        }
 
     }
 
@@ -258,6 +363,10 @@ public class TempScreen extends Screen {
 
     @Override
     public void dispose() {
+
+    }
+
+    public void toggleCheatSheet(){
 
     }
 }

@@ -106,7 +106,9 @@ public class Board{
                     GameLog.log("found block type "+blockType+" to be placed at "+i+","+j+" piece coord "+pieceVerticalCounter+" "+pieceHorizontalCounter);
                     //log+="found block type "+blockType+" to be placed at "+i+","+j+"\r\n";
 
-
+                    if(i<0){
+                        break;
+                    }
                     mBoard[i][j]=POS_FILLED;
                 }
             }//end of for loop going across
@@ -260,6 +262,18 @@ public class Board{
 
         }
 
+    }
+
+    public void clearBoard(){
+        for (int i = 0; i < BOARD_HEIGHT; i++){
+            for (int j = 0; j < BOARD_WIDTH; j++){
+
+                mBoard[i][j]=0;
+
+
+            }
+
+        }
     }
 }
 

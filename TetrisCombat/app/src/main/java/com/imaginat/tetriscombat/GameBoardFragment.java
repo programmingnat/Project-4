@@ -25,7 +25,9 @@ import com.imaginat.tetriscombat.framework.implementation.AndroidInput;
 public class GameBoardFragment extends Fragment implements Game {
 
     public interface ISendInfo{
-       public void communicate(int c);
+       public void communicate(int lineNo);
+        public void sendData(int instructions);
+
     }
     AndroidFastRenderView renderView;
     Graphics graphics;
