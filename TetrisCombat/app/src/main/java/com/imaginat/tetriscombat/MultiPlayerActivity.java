@@ -27,7 +27,6 @@ import com.google.android.gms.games.multiplayer.realtime.RoomUpdateListener;
 import com.google.example.games.basegameutils.BaseGameActivity;
 import com.google.example.games.basegameutils.BaseGameUtils;
 import com.imaginat.tetriscombat.googleAPIHelper.GoogleHelper;
-import com.imaginat.tetriscombat.googleAPIHelper.MessageListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,8 +41,8 @@ public class MultiPlayerActivity  extends BaseGameActivity
         RoomStatusUpdateListener, RoomUpdateListener, OnInvitationReceivedListener, GameBoardFragment.ISendInfo {
 
 
-    MessageListener mMessageListener;
-
+    //MessageListener mMessageListener;
+    TempScreen gameScreen=null;
     final static String TAG = "Falling Blocks";
 
     // Request codes for the UIs that we show with startActivityForResult:
@@ -121,8 +120,8 @@ public class MultiPlayerActivity  extends BaseGameActivity
             case R.id.button_single_player:
             case R.id.button_single_player_2:
                 // play a single-player game
-                //resetGameVars();
-                //startGame(false);
+                resetGameVars();
+                startGame(false);
                 break;
             case R.id.button_sign_in:
                 // user wants to sign in
@@ -185,7 +184,7 @@ public class MultiPlayerActivity  extends BaseGameActivity
         Bundle autoMatchCriteria = RoomConfig.createAutoMatchCriteria(MIN_OPPONENTS,
                 MAX_OPPONENTS, 0);
         RoomConfig.Builder rtmConfigBuilder = RoomConfig.builder(this);
-        mMessageListener = new MessageListener();
+       // mMessageListener = new MessageListener();
         rtmConfigBuilder.setMessageReceivedListener(this);//(mMessageListener);//GoogleHelper.getInstance());
         //rtmConfigBuilder.setMessageReceivedListener(GoogleHelper.getInstance());
         rtmConfigBuilder.setRoomStatusUpdateListener(this);
@@ -480,15 +479,15 @@ public class MultiPlayerActivity  extends BaseGameActivity
         //get participants and my ID:
         mParticipants = room.getParticipants();
         mGoogleHelper.setParticipants(mParticipants);
-        mMessageListener.setParticipants(mParticipants);
+        //mMessageListener.setParticipants(mParticipants);
         mMyId = room.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
 
         // save room ID if its not initialized in onRoomCreated() so we can leave cleanly before the game starts.
         if(mRoomId==null) {
             mRoomId = room.getRoomId();
-            Log.d(TAG,"Setting mRoomdId from onConnectedToRoom()");
+            Log.d(TAG, "Setting mRoomdId from onConnectedToRoom()");
             GoogleHelper.getInstance().setRoomId(mRoomId);
-            mMessageListener.setRoomId(mRoomId);
+            //mMessageListener.setRoomId(mRoomId);
 
         }
 
@@ -511,9 +510,9 @@ public class MultiPlayerActivity  extends BaseGameActivity
     @Override
     public void onDisconnectedFromRoom(Room room) {
         mRoomId = null;
-        Log.d(TAG,"Setting mRoomdId from onDisconnectedFromRoom()");
+        Log.d(TAG, "Setting mRoomdId from onDisconnectedFromRoom()");
         mGoogleHelper.setRoomId(mRoomId);
-        mMessageListener.setRoomId(mRoomId);
+        //mMessageListener.setRoomId(mRoomId);
         showGameError();
     }
 
@@ -535,9 +534,9 @@ public class MultiPlayerActivity  extends BaseGameActivity
 
         // save room ID so we can leave cleanly before the game starts.
         mRoomId = room.getRoomId();
-        Log.d(TAG,"Setting mRoomdId from onRoomCreated()");
+        Log.d(TAG, "Setting mRoomdId from onRoomCreated()");
         GoogleHelper.getInstance().setRoomId(mRoomId);
-        mMessageListener.setRoomId(mRoomId);
+        //mMessageListener.setRoomId(mRoomId);
         // show the waiting room UI
         showWaitingRoom(room);
     }
@@ -623,7 +622,7 @@ public class MultiPlayerActivity  extends BaseGameActivity
         if (room != null) {
             mParticipants = room.getParticipants();
             mGoogleHelper.setParticipants(mParticipants);
-            mMessageListener.setParticipants(mParticipants);
+            //mMessageListener.setParticipants(mParticipants);
         }
         if (mParticipants != null) {
             updatePeerScoresDisplay();
@@ -657,12 +656,12 @@ public class MultiPlayerActivity  extends BaseGameActivity
 
 
         GameBoardFragment gameBoardFragment = (GameBoardFragment)getSupportFragmentManager().findFragmentById(R.id.fragment2);
-        gameBoardFragment.setScreen(new TempScreen(gameBoardFragment));
+        gameBoardFragment.setScreen(gameScreen=new TempScreen(gameBoardFragment));
 
         updateScoreDisplay();
-        mGoogleHelper.broadcastScore(false);
+        //mGoogleHelper.broadcastScore(false);
         hideAllScreen();
-        //broadcastScore(false);
+        broadcastScore(false);
         //switchToScreen(R.id.screen_game);
 
         //findViewById(R.id.button_click_me).setVisibility(View.VISIBLE);
@@ -692,9 +691,9 @@ public class MultiPlayerActivity  extends BaseGameActivity
         if (mSecondsLeft <= 0) {
             // finish game
             findViewById(R.id.button_click_me).setVisibility(View.GONE);
-            //broadcastScore(true);
-            GoogleHelper.getInstance().setScore(mScore);
-            GoogleHelper.getInstance().broadcastScore(true);
+            broadcastScore(true);
+            //GoogleHelper.getInstance().setScore(mScore);
+            //GoogleHelper.getInstance().broadcastScore(true);
 
         }
     }
@@ -709,9 +708,9 @@ public class MultiPlayerActivity  extends BaseGameActivity
         updatePeerScoresDisplay();
 
         // broadcast our new score to our peers
-        GoogleHelper.getInstance().setScore(mScore);
-        GoogleHelper.getInstance().broadcastScore(false);
-        //broadcastScore(false);
+        //GoogleHelper.getInstance().setScore(mScore);
+        //GoogleHelper.getInstance().broadcastScore(false);
+        broadcastScore(false);
     }
 
     /*
@@ -855,7 +854,10 @@ public class MultiPlayerActivity  extends BaseGameActivity
 
     // updates the label that shows my score
     void updateScoreDisplay() {
-        ((TextView) findViewById(R.id.my_score)).setText(formatScore(mScore));
+        //((TextView) findViewById(R.id.my_score)).setText(formatScore(mScore));
+        if(gameScreen!=null){
+            gameScreen.setMyScore(mScore);
+        }
     }
 
     // formats a score as a three-digit number
@@ -869,12 +871,12 @@ public class MultiPlayerActivity  extends BaseGameActivity
     // updates the screen with the scores from our peers
     void updatePeerScoresDisplay() {
         mParticipants=mGoogleHelper.getParticipants();
-        Log.d("MultiPlayerActivity","size of mParticipants is "+mParticipants.size());
-        ((TextView) findViewById(R.id.score0)).setText(formatScore(mScore) + " - Me");
-        int[] arr = {
-                R.id.score1, R.id.score2, R.id.score3
-        };
-        int i = 0;
+        //Log.d("MultiPlayerActivity","size of mParticipants is "+mParticipants.size());
+//        ((TextView) findViewById(R.id.score0)).setText(formatScore(mScore) + " - Me");
+//        int[] arr = {
+//                R.id.score1, R.id.score2, R.id.score3
+//        };
+//        int i = 0;
 
         if (mRoomId != null) {
             for (Participant p : mParticipants) {
@@ -884,15 +886,18 @@ public class MultiPlayerActivity  extends BaseGameActivity
                 if (p.getStatus() != Participant.STATUS_JOINED)
                     continue;
                 int score = mParticipantScore.containsKey(pid) ? mParticipantScore.get(pid) : 0;
-                ((TextView) findViewById(arr[i])).setText(formatScore(score) + " - " +
-                        p.getDisplayName()+" good job");
-                ++i;
+                if(gameScreen!=null){
+                    gameScreen.setOpponentScore(score);
+                }
+//                ((TextView) findViewById(arr[i])).setText(formatScore(score) + " - " +
+//                        p.getDisplayName()+" good job");
+//                ++i;
             }
         }
 
-        for (; i < arr.length; ++i) {
-            ((TextView) findViewById(arr[i])).setText("");
-        }
+//        for (; i < arr.length; ++i) {
+//            ((TextView) findViewById(arr[i])).setText("");
+//        }
     }
 
     //=======MISC=================
@@ -921,8 +926,10 @@ public class MultiPlayerActivity  extends BaseGameActivity
     }
 
     @Override
-    public void communicate() {
-        Log.d("MultiplayerActivity","Communicate Called");
+    public void communicate(int noOfLines) {
+        Log.d("MultiplayerActivity","Communicate Called with score "+noOfLines);
+        mScore=noOfLines;
+        updateScoreDisplay();
         broadcastScore(false);
     }
 }

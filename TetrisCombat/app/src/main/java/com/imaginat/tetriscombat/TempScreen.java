@@ -1,6 +1,7 @@
 package com.imaginat.tetriscombat;
 
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 
 import com.imaginat.tetriscombat.framework.Game;
@@ -24,6 +25,8 @@ public class TempScreen extends Screen {
     Board mBoard = null;
     GameModel mGameModel = null;
 
+    int mMyScore=0,mOpponentScore=0;
+
 
     GameBoardFragment.ISendInfo isendInfo=null;
 
@@ -32,6 +35,23 @@ public class TempScreen extends Screen {
     int deltaX = 1, deltaY;
 
     static final float TICK_INITIAL = 1.5f;
+
+    public int getMyScore() {
+        return mMyScore;
+    }
+
+    public void setMyScore(int myScore) {
+        mMyScore = myScore;
+    }
+
+    public int getOpponentScore() {
+        return mOpponentScore;
+    }
+
+    public void setOpponentScore(int opponentScore) {
+        mOpponentScore = opponentScore;
+    }
+
     static final float TICK_DECREMENT = 0.5f;
     float tickTime = 0;
     static float tick = TICK_INITIAL;
@@ -170,7 +190,7 @@ public class TempScreen extends Screen {
                 Log.d("TempScreen", "About to call setScore and boradcastScore");
                 //mGoogleHelper.setScore(mBoard.getDeletedLineCount());
                 //GoogleHelper.getInstance().broadcastScore(false);
-                isendInfo.communicate();
+                isendInfo.communicate(mBoard.getDeletedLineCount());
                 if (mBoard.isGameOver()) {
 
                     System.out.println("GAME OVER");
@@ -180,6 +200,7 @@ public class TempScreen extends Screen {
                 GameLog.log("++++++++CREATING new piece");
                 //GameLog.getInstance().write(log);
                 mGameModel.createNewPiece();
+
 
             }
             if (tick - TICK_DECREMENT > 0) {
@@ -216,6 +237,12 @@ public class TempScreen extends Screen {
         g.drawRect(g.getWidth() - 60, 450, 60, 30, Color.BLUE);
         g.drawRect(61, 450, 100, 30, Color.GREEN);
         g.drawRect(161, 450, 99, 30, Color.GRAY);
+
+
+        Paint paint = new Paint();
+        paint.setColor(Color.WHITE);
+        g.drawText("Me:"+mMyScore, 10, 20, paint);
+        g.drawText("Opponent:"+mOpponentScore, 10, 40, paint);
 
     }
 

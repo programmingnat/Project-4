@@ -121,6 +121,9 @@ public class AndroidGraphics implements Graphics {
         canvas.drawBitmap(((AndroidPixmap)pixmap).bitmap, x, y, null);
     }
 
+    public void drawText(String text,int x,int y,Paint paint){
+        canvas.drawText(text,x,y,paint);
+    }
     @Override
     public int getWidth() {
         return frameBuffer.getWidth();
