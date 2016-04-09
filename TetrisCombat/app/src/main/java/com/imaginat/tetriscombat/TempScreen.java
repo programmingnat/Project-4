@@ -21,6 +21,7 @@ import java.util.List;
  */
 public class TempScreen extends Screen {
 
+
     class FakeButton{
         int x,y,width,length;
     }
@@ -136,6 +137,9 @@ public class TempScreen extends Screen {
        if (isGameOver) {
             return;
         }
+
+
+
 
         Graphics g = game.getGraphics();
         List<TouchEvent> touchEvents = game.getInput().getTouchEvents();
@@ -267,8 +271,11 @@ public class TempScreen extends Screen {
                 //GoogleHelper.getInstance().broadcastScore(false);
                 isendInfo.communicate(mBoard.getDeletedLineCount());
                 if (mBoard.isGameOver()) {
+                    Log.d("TempScreen","isGameOver is true");
+                    int endGameReasoning = mBoard.getEndGameReasoning();
+                    isendInfo.sendData(-100+endGameReasoning);
+                    return;
 
-                    isendInfo.sendData(-100);
 
                 }
                 GameLog.log("++++++++CREATING new piece");
@@ -298,8 +305,10 @@ public class TempScreen extends Screen {
         for (int yStart = 0; yStart < 425; yStart += 25) {
             g.drawLine(10, yStart, 260, yStart, Color.GRAY);
         }
-        mBoard.paintMovingPiece(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation,g);
+        mBoard.paintMovingPiece(mGameModel.mPosX, mGameModel.mPosY, mGameModel.mPiece, mGameModel.mRotation, g);
         mBoard.displayBoard(g);
+
+        g.drawRect(320-60,0,60,480, Color.WHITE);
         //theHorizontalTestBox.render(g);
         //theVerticalTestBox.render(g);
         //g.drawLine(0,0,100,100, Color.RED);
@@ -345,6 +354,7 @@ public class TempScreen extends Screen {
             for (int i = 0; i < mCheatSheetButtons.length; i++) {
                 FakeButton b = mCheatSheetButtons[i];
                 g.drawRect(b.x, b.y, b.width, b.length, Color.GRAY);
+
 
             }
         }

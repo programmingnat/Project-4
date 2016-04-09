@@ -1,8 +1,11 @@
 package com.imaginat.tetriscombat;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -88,6 +91,13 @@ public class MultiPlayerActivity extends BaseGameActivity
 
     GoogleHelper mGoogleHelper = null;
 
+    boolean mPeerLeft;
+
+    public final static int GAME_PRESTART=0;
+    public final static int GAME_RUNNING=1;
+    public final static int GAME_OVER=2;
+    private int mGameState=GAME_PRESTART;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +122,19 @@ public class MultiPlayerActivity extends BaseGameActivity
     }
 
 
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Exit")
+                .setMessage("Are you sure you want to exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                        System.exit(0);
+                    }
+                }).setNegativeButton("No", null).show();
+    }
     @Override
     public void onClick(View v) {
         Intent intent;
@@ -508,7 +531,7 @@ public class MultiPlayerActivity extends BaseGameActivity
     @Override
     public void onDisconnectedFromRoom(Room room) {
         mRoomId = null;
-        Log.d(TAG, "Setting mRoomdId from onDisconnectedFromRoom()");
+        Log.d(TAG, " mRoomdId from onDisconnectedFromRoom()");
         mGoogleHelper.setRoomId(mRoomId);
         //mMessageListener.setRoomId(mRoomId);
         showGameError();
@@ -517,7 +540,9 @@ public class MultiPlayerActivity extends BaseGameActivity
     // Show error message about game being cancelled and return to main screen.
     void showGameError() {
         BaseGameUtils.makeSimpleDialog(this, getString(R.string.game_problem));
-        switchToMainScreen();
+
+
+        //switchToMainScreen();
     }
 
     // Called when room has been created
@@ -593,7 +618,15 @@ public class MultiPlayerActivity extends BaseGameActivity
 
     @Override
     public void onPeerLeft(Room room, List<String> peersWhoLeft) {
-        updateRoom(room);
+        Log.d("Multilayer","onPeerLeft called--that means the game is over");
+        mPeerLeft=true;
+        GameBoardFragment gameBoardFragment = (GameBoardFragment) getSupportFragmentManager().findFragmentById(R.id.fragment2);
+        gameScreen = new TempScreen(gameBoardFragment);
+        GameOverScreen gos = new GameOverScreen(gameBoardFragment);
+        gos.setGameEndingReason(GameOverScreen.OPPONENT_QUIT_GAME);
+        gameBoardFragment.setScreen(gos);
+        //make THIS person the winner
+        //updateRoom(room);
     }
 
     @Override
@@ -625,6 +658,10 @@ public class MultiPlayerActivity extends BaseGameActivity
         if (mParticipants != null) {
             updatePeerScoresDisplay();
             mGoogleHelper.updatePeerScoresDisplay();
+            if(mParticipants.size()==1){
+                Log.d("MultiPlayerActivity","you are the only one left in the room--you win!");
+
+            }
         }
     }
 
@@ -634,7 +671,7 @@ public class MultiPlayerActivity extends BaseGameActivity
 
     // Current state of the game:
     int mSecondsLeft = -1; // how long until the game ends (seconds)
-    final static int GAME_DURATION = 20; // game duration, seconds.
+    final static int GAME_DURATION = 300; // game duration, seconds.
     int mScore = 0; // user's current score
 
     // Reset game variables in preparation for a new game.
@@ -666,7 +703,7 @@ public class MultiPlayerActivity extends BaseGameActivity
         //findViewById(R.id.button_click_me).setVisibility(View.VISIBLE);
 
         // run the gameTick() method every second to update the game.
-        /*final Handler h = new Handler();
+        final Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -675,25 +712,32 @@ public class MultiPlayerActivity extends BaseGameActivity
                 gameTick();
                 h.postDelayed(this, 1000);
             }
-        }, 1000);*/
+        }, 1000);
     }
 
     // Game tick -- update countdown, check if game ended.
     void gameTick() {
+        Log.d("MultiplayerActivity","Inside gameTick");
         if (mSecondsLeft > 0)
             --mSecondsLeft;
 
         // update countdown
-        ((TextView) findViewById(R.id.countdown)).setText("0:" +
-                (mSecondsLeft < 10 ? "0" : "") + String.valueOf(mSecondsLeft));
+        //((TextView) findViewById(R.id.countdown)).setText("0:" +
+         //       (mSecondsLeft < 10 ? "0" : "") + String.valueOf(mSecondsLeft));
 
+        if(mGameState==GAME_OVER){
+            //switchToMainScreen();
+            if(mMultiplayer){
+                leaveRoom();
+
+            }
+            return;
+        }
         if (mSecondsLeft <= 0) {
             // finish game
-            findViewById(R.id.button_click_me).setVisibility(View.GONE);
-            broadcastScore(true);
-            //GoogleHelper.getInstance().setScore(mScore);
-            //GoogleHelper.getInstance().broadcastScore(true);
-
+            mGameState = MultiPlayerActivity.GAME_OVER;
+            //findViewById(R.id.button_click_me).setVisibility(View.GONE);
+            //broadcastScore(true);
         }
     }
 
@@ -787,7 +831,7 @@ public class MultiPlayerActivity extends BaseGameActivity
                         gameScreen.toggleBlockView();
                         Log.d("Instructions","block view ");
                     }else{
-                        Log.d("Instructions","Would block view, but is null");
+                        Log.d("Instructions", "Would block view, but is null");
                     }
                     break;
                 case 3:
@@ -989,7 +1033,7 @@ public class MultiPlayerActivity extends BaseGameActivity
     //this is for the score
     @Override
     public void communicate(int noOfLines) {
-        Log.d("MultiplayerActivity", "Communicate Called with score " + noOfLines);
+        //Log.d("MultiplayerActivity", "Communicate Called with score " + noOfLines);
         mScore = noOfLines;
         updateScoreDisplay();
         broadcastScore(false);
@@ -998,19 +1042,29 @@ public class MultiPlayerActivity extends BaseGameActivity
     //this is for instructions
     @Override
     public void sendData(int instructions) {
-        if(instructions==-100){
+        if(instructions<0){
             if(mMultiplayer){
-                leaveRoom();
-            }
+                //leaveRoom();
 
+            }
+            Log.d("MultiPlayerActivity", "inside send data with instrcutinos " + instructions);
             //switchToMainScreen();
+            mGameState= MultiPlayerActivity.GAME_OVER;
             GameBoardFragment gameBoardFragment = (GameBoardFragment) getSupportFragmentManager().findFragmentById(R.id.fragment2);
 
-            gameBoardFragment.setScreen(new BlankScreen(gameBoardFragment));
+            GameOverScreen gos = new GameOverScreen(gameBoardFragment);
+
+            gos.setGameEndingReason(GameOverScreen.TIME_LIMIT_REACHED);
+            gameBoardFragment.setScreen(gos);
             return;
         }
         broadcastInstructions(instructions);
+
+
+        //// Log.d("Multilayer","onPeerLeft called--that means the game is over");
+
     }
+
 
 
 }

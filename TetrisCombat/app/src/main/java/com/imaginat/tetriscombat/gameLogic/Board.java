@@ -25,14 +25,23 @@ public class Board{
     public final static byte TEMP_PAINT=5;
 
 
+    public static final int TIMES_UP=-10;
+    public static final int NO_MORE_ROOM=-20;
+
+    private int mEndGameReasoning=-1;
 
     private int mDeletedLineCount;
 
     private byte[][] mBoard;
     private Pieces mPieces = null;
+
     public Board(Pieces pieces){
 
         mPieces = pieces;
+    }
+
+    public int getEndGameReasoning() {
+        return mEndGameReasoning;
     }
 
     public void init(){
@@ -42,7 +51,9 @@ public class Board{
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 mBoard[i][j] = POS_FREE;
             }
+
         }
+
     }
 
     public void clearMovingPiece(){
@@ -95,9 +106,9 @@ public class Board{
 //        }
     }
     public void placePiece(int pX,int pY,int pieceType,int rotation){
-        GameLog.log("Inside placePiece with " + pX + " " + pY + " " + pieceType + " " + rotation );
-        GameLog.log("board before this call");
-        printBoard();
+        //GameLog.log("Inside placePiece with " + pX + " " + pY + " " + pieceType + " " + rotation );
+        //GameLog.log("board before this call");
+        //printBoard();
         for(int i=pY,pieceVerticalCounter=0;i<pY+PIECE_BLOCKS;i++,pieceVerticalCounter++){
 
             for(int j=pX,pieceHorizontalCounter=0;j<pX+PIECE_BLOCKS;j++,pieceHorizontalCounter++){
@@ -124,6 +135,7 @@ public class Board{
         {
             if (mBoard[0][i] == POS_FILLED){
                 System.out.println("isGameOver? foiund block at [0]["+i+"]");
+                mEndGameReasoning=Board.TIMES_UP;
                 return true;
             }
         }
