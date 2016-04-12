@@ -9,4 +9,11 @@ public class Assets {
     public static Pixmap dPad;
     public static Pixmap rotateButton;
     public static Pixmap pauseButton;
+    public static Pixmap rightArrow;
+    public static Pixmap leftArrow;
+    public static Pixmap downArrow;
+    public static Pixmap blockViewIcon;
+    public static Pixmap clearBoardIcon;
+    public static Pixmap controllerIcon;
+    public static Pixmap noControlIcon;
 }

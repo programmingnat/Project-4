@@ -20,6 +20,13 @@ public class LoadingScreen extends Screen {
         Assets.dPad = g.newPixmap("dpad.png", Graphics.PixmapFormat.ARGB4444);
         Assets.rotateButton = g.newPixmap("rotatebutton.png", Graphics.PixmapFormat.ARGB4444);
         Assets.pauseButton = g.newPixmap("pausebutton.png", Graphics.PixmapFormat.ARGB4444);
+        Assets.downArrow = g.newPixmap("down_arrow.png", Graphics.PixmapFormat.ARGB4444);
+        Assets.rightArrow = g.newPixmap("right_arrow.png", Graphics.PixmapFormat.ARGB4444);
+        Assets.leftArrow = g.newPixmap("left_arrow.png", Graphics.PixmapFormat.ARGB4444);
+       Assets.blockViewIcon= g.newPixmap("hide_view.jpg", Graphics.PixmapFormat.RGB565);
+        Assets.clearBoardIcon= g.newPixmap("clean_sweep.jpg", Graphics.PixmapFormat.RGB565);
+        Assets.controllerIcon= g.newPixmap("controls_disappear.jpg", Graphics.PixmapFormat.RGB565);
+        Assets.noControlIcon= g.newPixmap("loss_control.jpg", Graphics.PixmapFormat.RGB565);
         game.setScreen(gameScreen);
     }
 

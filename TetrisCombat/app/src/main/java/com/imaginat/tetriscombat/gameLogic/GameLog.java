@@ -40,7 +40,7 @@ public class GameLog {
     }
 
     public static void  log(String s){
-        Log.d("GameLog",s);
+        //Log.d("GameLog",s);
     }
 
 }

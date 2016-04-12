@@ -4,8 +4,6 @@ package com.imaginat.tetriscombat.gameLogic;
  * Created by nat on 3/27/16.
  */
 
-import android.graphics.Color;
-
 import com.imaginat.tetriscombat.framework.Graphics;
 
 /**
@@ -22,6 +20,7 @@ public class Board{
     public final static int PIECE_BLOCKS=5; // Number of horizontal and vertical blocks of a matrix piece
     public final static byte POS_FREE=0;
     public final static byte POS_FILLED=1;
+
     public final static byte TEMP_PAINT=5;
 
 
@@ -30,7 +29,13 @@ public class Board{
 
     private int mEndGameReasoning=-1;
 
-    private int mDeletedLineCount;
+    private int mPrevDeletedLineCount=0;
+    private int mDeletedLineCount=0;
+    private int mScore=0;
+
+    public int getScore() {
+        return mScore;
+    }
 
     private byte[][] mBoard;
     private Pieces mPieces = null;
@@ -66,7 +71,7 @@ public class Board{
         }*/
     }
     //this is for debugging purpose only
-    public void paintMovingPiece(int pX,int pY,int pieceType,int rotation,Graphics g){
+    public void paintMovingPiece(int pX,int pY,int pieceType,int rotation,int color,Graphics g){
 
         for(int i=pY,pieceVerticalCounter=0;i<pY+PIECE_BLOCKS;i++,pieceVerticalCounter++){
 
@@ -78,7 +83,9 @@ public class Board{
                     if(i<0  || j<0){
                         continue;
                     }
-                    g.drawRect(10+(j*25),i*25,25,25, Color.BLUE);
+
+                    //Log.d("Board","paintMovingPiece:");
+                    g.drawRect(10+(j*25),i*25,25,25,color);
                     //debugIDrewHere.push(new DebugPoint(i,j));
                     //mBoard[i][j]=TEMP_PAINT;
                 }
@@ -86,8 +93,35 @@ public class Board{
 
         }//for loop going down
 
+
+
     }
 
+    public void paintNextPiece(int pieceType,int rotation,int color,Graphics g){
+
+        for(int i=0,pieceVerticalCounter=0;i<PIECE_BLOCKS;i++,pieceVerticalCounter++){
+
+            for(int j=0,pieceHorizontalCounter=0;j<PIECE_BLOCKS;j++,pieceHorizontalCounter++){
+
+                if(mPieces.getBlockType(pieceType,rotation,pieceVerticalCounter,pieceHorizontalCounter)!=0){
+                    //int blockType=mPieces.getBlockType(pieceType,rotation,j,i);
+                    //System.out.println("found block type "+blockType+" to be placed at "+i+","+j);
+                    if(i<0  || j<0){
+                        continue;
+                    }
+
+                    //Log.d("Board","paintMovingPiece:");
+                    g.drawRect(260+(j*10),i*10,10,10,color);
+                    //debugIDrewHere.push(new DebugPoint(i,j));
+                    //mBoard[i][j]=TEMP_PAINT;
+                }
+            }//end of for loop going across
+
+        }//for loop going down
+
+
+
+    }
     //for debuggint purposes
     public void printSelectedShapeBlocks(int pieceNo,int rotation){
         int[][] block = Pieces.mPieces[pieceNo][rotation];
@@ -105,7 +139,7 @@ public class Board{
 //
 //        }
     }
-    public void placePiece(int pX,int pY,int pieceType,int rotation){
+    public void placePiece(int pX,int pY,int pieceType,int rotation,byte fillColorIndex){
         //GameLog.log("Inside placePiece with " + pX + " " + pY + " " + pieceType + " " + rotation );
         //GameLog.log("board before this call");
         //printBoard();
@@ -120,7 +154,7 @@ public class Board{
                     if(i<0){
                         break;
                     }
-                    mBoard[i][j]=POS_FILLED;
+                    mBoard[i][j]=fillColorIndex;//POS_FILLED;
                 }
             }//end of for loop going across
             //GameLog.getInstance().write(log);
@@ -133,7 +167,7 @@ public class Board{
         //If the first line has blocks, then, game over
         for (int i = 0; i < BOARD_WIDTH; i++)
         {
-            if (mBoard[0][i] == POS_FILLED){
+            if (mBoard[0][i] >0){//== POS_FILLED){
                 System.out.println("isGameOver? foiund block at [0]["+i+"]");
                 mEndGameReasoning=Board.TIMES_UP;
                 return true;
@@ -160,12 +194,13 @@ public class Board{
     }
     public void deletePossibleLines ()
     {
+        mDeletedLineCount=0;
         for (int j = 0; j < BOARD_HEIGHT; j++)
         {
             int i = 0;
             while (i < BOARD_WIDTH)
             {
-                if (mBoard[j][i] != POS_FILLED) break;
+                if (mBoard[j][i] == 0) break;
                 i++;
             }
 
@@ -175,13 +210,34 @@ public class Board{
                 deleteLine (j);
             }
         }
+
+        //update score
+        int scoreAddition=calculateScore(mDeletedLineCount);
+        if(mPrevDeletedLineCount==4){
+            scoreAddition*=2;
+        }
+        mScore+=scoreAddition;
+
     }
 
-    public boolean isFreeBlock (int pX, int pY)
-    {
+    private int calculateScore(int noOfLines){
+        switch(noOfLines){
+            case 1:
+                return 10;
+            case 2:
+                return 22;
+            case 3:
+                return 33;
+            case 4:
+                return 80;
+        }
+
+        return 0;
+    }
+    public boolean isFreeBlock (int pX, int pY) {
         //System.out.print("Inside isFreeBlock with args "+pX+" "+pY);
         //System.out.print("value is "+mBoard [pX][pY]);
-        if (mBoard [pX][pY] == POS_FREE || mBoard[pX][pY]==TEMP_PAINT) {
+        if (mBoard [pX][pY] == POS_FREE){// || mBoard[pX][pY]==TEMP_PAINT) {
             //System.out.println(" returning true");
             return true;
         }else {
@@ -266,7 +322,7 @@ public class Board{
             for (int j = 0; j < BOARD_WIDTH; j++){
 
                     if (mBoard[i][j] != 0){
-                        g.drawRect(10+(j*25),i*25,25,25, Color.RED);
+                        g.drawRect(10+(j*25),i*25,25,25, GameModel.GAME_COLORS[mBoard[i][j]-1]);
                     }
 
 

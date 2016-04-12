@@ -621,7 +621,7 @@ public class MultiPlayerActivity extends BaseGameActivity
         Log.d("Multilayer","onPeerLeft called--that means the game is over");
         mPeerLeft=true;
         GameBoardFragment gameBoardFragment = (GameBoardFragment) getSupportFragmentManager().findFragmentById(R.id.fragment2);
-        gameScreen = new TempScreen(gameBoardFragment);
+        //gameScreen = new TempScreen(gameBoardFragment);
         GameOverScreen gos = new GameOverScreen(gameBoardFragment);
         gos.setGameEndingReason(GameOverScreen.OPPONENT_QUIT_GAME);
         gameBoardFragment.setScreen(gos);
@@ -835,7 +835,12 @@ public class MultiPlayerActivity extends BaseGameActivity
                     }
                     break;
                 case 3:
+                    if(gameScreen!=null){
+                        gameScreen.toggleAccelerometer();
+                        Log.d("Instruction","Would turn accelerometer on, and control off");
+                    }else{
 
+                    }
                     break;
                 case 4:
 
