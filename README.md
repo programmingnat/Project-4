@@ -13,5 +13,5 @@ The powers are as followed:<br/>
     *FOR USE OF ACCELEROMETER: When activated, the controls will no longer work, and the opponent will be forced to use the device's  accelerometer
     
     <img src="https://raw.githubusercontent.com/programmingnat/Project-4/master/Screenshot_20160411-180332.png"/>
-    https://raw.githubusercontent.com/programmingnat/Project-4/master/Screenshot_20160411-180332.png
+ 
 
