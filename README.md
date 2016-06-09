@@ -1,7 +1,8 @@
 ## FALLING BLOCKS THAT DISAPPEAR WHEN THEY FORM A LINE
-
+(you can't call it Tetris)
 Falling Blocks is a puzzle game that can be played in either single player mode or multi-player mode.
 The app is similar to the classic game Tetris, with the exception that it can be played head to head over a network.
+Google Play Store:<a href="https://play.google.com/store/apps/details?id=com.imaginat.tetriscombat&hl=en">here</a>
 
 
 <img src="https://raw.githubusercontent.com/programmingnat/Project-4/master/screenshots_profile.png"/>
